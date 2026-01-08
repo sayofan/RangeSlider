@@ -130,7 +130,10 @@ class RangeSliderH(Frame):
         self.canv = Canvas(self, height = self.canv_H, width = self.canv_W, bg=bgColor, bd=0 , highlightthickness=0, relief='ridge')
         self.canv.pack()
         # now able to grab right handle with right click if two handles are on the same position
-        # other possibilities without right-click: move handle in direction of click on track; if bars have equal position on mousedown, select based on first movement 
+        # other possibilities without right-click: 
+        # - move handle in direction of click on track; 
+        # - if bars have equal position on mousedown, select based on first movement 
+        # - if bars are both at 0, select second/right handle
         self.canv.bind("<Button-1>", self._mouseMotion_b1)
         self.canv.bind("<Button-3>", self._mouseMotion_b3)
         self.canv.bind("<Motion>", self._mouseMotion_b1)  # still leave the selection on motion without click / after mouse was released
