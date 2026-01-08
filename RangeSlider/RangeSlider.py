@@ -129,8 +129,13 @@ class RangeSliderH(Frame):
 
         self.canv = Canvas(self, height = self.canv_H, width = self.canv_W, bg=bgColor, bd=0 , highlightthickness=0, relief='ridge')
         self.canv.pack()
-        self.canv.bind("<Motion>", self._mouseMotion)
+        # now able to grab right handle with right click if two handles are on the same position
+        # other possibilities without right-click: move handle in direction of click on track; if bars have equal position on mousedown, select based on first movement 
+        self.canv.bind("<Button-1>", self._mouseMotion_b1)
+        self.canv.bind("<Button-3>", self._mouseMotion_b3)
+        self.canv.bind("<Motion>", self._mouseMotion_b1)  # still leave the selection on motion without click / after mouse was released
         self.canv.bind("<B1-Motion>", self._moveBar)
+        self.canv.bind("<B3-Motion>", self._moveBar)
 
         self.track = self.__addTrack(self.slider_x, self.slider_y, self.canv_W-self.slider_x, self.slider_y, self.bars[0]["Pos"], self.bars[1]["Pos"])
         tempIdx=0
@@ -174,7 +179,7 @@ class RangeSliderH(Frame):
         for idx in range(len(self.bars)):
             self.__moveBar(idx, pos[idx])
 
-    def _mouseMotion(self, event):
+    def _mouseMotion_b1(self, event):
         x = event.x; y = event.y
         selection = self.__checkSelection(x,y)
         if selection[0]:
@@ -183,6 +188,17 @@ class RangeSliderH(Frame):
         else:
             self.canv.config(cursor = "")
             self.selected_idx = None
+
+    def _mouseMotion_b3(self, event):
+        x = event.x; y = event.y
+        selection = self.__checkSelection(x,y, right_handle_first=True)
+        if selection[0]:
+            self.canv.config(cursor = "hand2")
+            self.selected_idx = selection[1]
+        else:
+            self.canv.config(cursor = "")
+            self.selected_idx = None
+
 
     def _moveBar(self, event):
         x = event.x; y = event.y
@@ -292,15 +308,18 @@ class RangeSliderH(Frame):
             otherPos=positions[1]
             if self.cross_each_other == False:
                 if pos<=otherPos:
+                # if pos<otherPos:  # test pw
                     pos=pos
                 else:
                     pos=current_pos
+                    # self.selected_idx = otherIdx  # test pw, select the second handle 
             self.track[0], self.track[1], self.track[-1] = self.__addTrackL(self.slider_x, self.slider_y, self.canv_W-self.slider_x, self.slider_y, pos, otherPos)
         else:
             otherIdx=0
             otherPos=positions[0]
             if self.cross_each_other == False:
                 if pos>=otherPos:
+                # if pos>otherPos:  # test pw not allowing same values can sometimes be useful
                     pos=pos
                 else:
                     pos=current_pos
@@ -337,16 +356,22 @@ class RangeSliderH(Frame):
         pos = self.__calcPos(x)
         return pos*(self.max_val - self.min_val)+self.min_val
 
-    def __checkSelection(self, x, y):
+    def __checkSelection(self, x, y, right_handle_first=False):
         """
         To check if the position is inside the bounding rectangle of a Bar
         Return [True, bar_index] or [False, None]
         """
-        for idx in range(len(self.bars)):
+        if right_handle_first:
+            bars_ids = reversed(range(len(self.bars)))
+        else:
+            bars_ids = range(len(self.bars))
+
+        for idx in bars_ids:
             id = self.bars[idx]["Ids"][0]
             bbox = self.canv.bbox(id)
             if bbox[0] < x and bbox[2] > x and bbox[1] < y and bbox[3] > y:
                 return [True, idx]
+        # Note: position may possibly be inside more than one bar/handle only the left-most (or right-most with reversed) can be moved
         return [False, None]
 
 
