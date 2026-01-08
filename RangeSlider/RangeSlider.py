@@ -313,18 +313,15 @@ class RangeSliderH(Frame):
             otherPos=positions[1]
             if self.cross_each_other == False:
                 if pos<=otherPos:
-                # if pos<otherPos:  # test pw
                     pos=pos
                 else:
                     pos=current_pos
-                    # self.selected_idx = otherIdx  # test pw, select the second handle 
             self.track[0], self.track[1], self.track[-1] = self.__addTrackL(self.slider_x, self.slider_y, self.canv_W-self.slider_x, self.slider_y, pos, otherPos)
         else:
             otherIdx=0
             otherPos=positions[0]
             if self.cross_each_other == False:
                 if pos>=otherPos:
-                # if pos>otherPos:  # test pw not allowing same values can sometimes be useful
                     pos=pos
                 else:
                     pos=current_pos
