@@ -23,7 +23,7 @@ class RangeSliderH(Frame):
                     auto=True, line_width=3, bar_radius=10,
                     bar_color_inner='#5c8a8a', line_s_color="#0a50ff", bar_color_outer='#c2d6d6', line_color = '#476b6b', bgColor= '#ffffff', step_marker_color = "#ffffff", font_color = '#000000',
                     show_value = True, digit_precision='.1f', valueSide='TOP', font_family='Times', font_size=16, suffix="",
-                    step_size = 0,step_marker=False, cross_each_other = False):
+                    step_size = 0,step_marker=False, cross_each_other = False, enable_right_click_movement=False):
         RangeSliderH.LINE_COLOR=line_color
         RangeSliderH.LINE_WIDTH=line_width
         RangeSliderH.BAR_COLOR_INNER=bar_color_inner
@@ -129,16 +129,18 @@ class RangeSliderH(Frame):
 
         self.canv = Canvas(self, height = self.canv_H, width = self.canv_W, bg=bgColor, bd=0 , highlightthickness=0, relief='ridge')
         self.canv.pack()
-        # now able to grab right handle with right click if two handles are on the same position
-        # other possibilities without right-click: 
-        # - move handle in direction of click on track; 
-        # - if bars have equal position on mousedown, select based on first movement 
-        # - if bars are both at 0, select second/right handle
-        self.canv.bind("<Button-1>", self._mouseMotion_b1)
-        self.canv.bind("<Button-3>", self._mouseMotion_b3)
+
         self.canv.bind("<Motion>", self._mouseMotion_b1)  # still leave the selection on motion without click / after mouse was released
         self.canv.bind("<B1-Motion>", self._moveBar)
-        self.canv.bind("<B3-Motion>", self._moveBar)
+        if enable_right_click_movement:
+            # now able to grab right handle with right click if two handles are on the same position
+            # other possibilities without right-click: 
+            # - move handle in direction of click on track; 
+            # - if bars have equal position on mousedown, select based on first movement 
+            # - if bars are both at 0, select second/right handle
+            # self.canv.bind("<Button-1>", self._mouseMotion_b1)  # not necessary
+            self.canv.bind("<Button-3>", self._mouseMotion_b3)
+            self.canv.bind("<B3-Motion>", self._moveBar)
 
         self.track = self.__addTrack(self.slider_x, self.slider_y, self.canv_W-self.slider_x, self.slider_y, self.bars[0]["Pos"], self.bars[1]["Pos"])
         tempIdx=0
