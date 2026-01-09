@@ -88,6 +88,9 @@ class RangeSliderH(Frame):
         self.canv_W = self.W
         self.suffix=suffix
         self.variables=variables
+        if variables:
+            variables[0].trace_add("write", self._trace_vars_write)
+            variables[1].trace_add("write", self._trace_vars_write)
         self.step_marker = step_marker
         if self.step_marker:
             assert step_size > 0, "[step_size] must be provided if [step_marker] set to True."
@@ -348,6 +351,11 @@ class RangeSliderH(Frame):
             if bbox[0] < x and bbox[2] > x and bbox[1] < y and bbox[3] > y:
                 return [True, idx]
         return [False, None]
+    
+    def _trace_vars_write(self, *args):
+        firstVal = self.variables[0].get()
+        secondVal = self.variables[1].get()
+        self.forceValues([firstVal, secondVal])
 
 
 class RangeSliderV(Frame):
@@ -445,6 +453,9 @@ class RangeSliderV(Frame):
         self.canv_W = self.W
         self.suffix=suffix
         self.variables=variables
+        if variables:
+            variables[0].trace_add("write", self._trace_vars_write)
+            variables[1].trace_add("write", self._trace_vars_write)
         self.step_size= step_size / (self.max_val-self.min_val)
         if not show_value:
             self.slider_x = self.canv_W/2 # y pos of the slider
@@ -685,3 +696,8 @@ class RangeSliderV(Frame):
             if bbox[0] < x and bbox[2] > x and bbox[1] < y and bbox[3] > y:
                 return [True, idx]
         return [False, None]
+    
+    def _trace_vars_write(self, *args):
+        firstVal = self.variables[0].get()
+        secondVal = self.variables[1].get()
+        self.forceValues([firstVal, secondVal])
