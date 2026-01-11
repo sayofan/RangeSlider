@@ -89,8 +89,8 @@ class RangeSliderH(Frame):
         self.suffix=suffix
         self.variables=variables
         if variables:
-            variables[0].trace_add("write", self._trace_vars_write)
-            variables[1].trace_add("write", self._trace_vars_write)
+            variables[0].trace_add("write", self._trace_vars_write0)
+            variables[1].trace_add("write", self._trace_vars_write1)
         self.step_marker = step_marker
         if self.step_marker:
             assert step_size > 0, "[step_size] must be provided if [step_marker] set to True."
@@ -352,10 +352,13 @@ class RangeSliderH(Frame):
                 return [True, idx]
         return [False, None]
     
-    def _trace_vars_write(self, *args):
+    def _trace_vars_write0(self, *args):
         firstVal = self.variables[0].get()
+        self.__moveBar(0, (firstVal - self.min_val)/(self.max_val - self.min_val))
+
+    def _trace_vars_write1(self, *args):
         secondVal = self.variables[1].get()
-        self.forceValues([firstVal, secondVal])
+        self.__moveBar(1, (secondVal - self.min_val)/(self.max_val - self.min_val))
 
 
 class RangeSliderV(Frame):
@@ -454,8 +457,8 @@ class RangeSliderV(Frame):
         self.suffix=suffix
         self.variables=variables
         if variables:
-            variables[0].trace_add("write", self._trace_vars_write)
-            variables[1].trace_add("write", self._trace_vars_write)
+            variables[0].trace_add("write", self._trace_vars_write0)
+            variables[1].trace_add("write", self._trace_vars_write1)
         self.step_size= step_size / (self.max_val-self.min_val)
         if not show_value:
             self.slider_x = self.canv_W/2 # y pos of the slider
@@ -697,7 +700,10 @@ class RangeSliderV(Frame):
                 return [True, idx]
         return [False, None]
     
-    def _trace_vars_write(self, *args):
+    def _trace_vars_write0(self, *args):
         firstVal = self.variables[0].get()
+        self.__moveBar(0, (firstVal - self.min_val)/(self.max_val - self.min_val))
+
+    def _trace_vars_write1(self, *args):
         secondVal = self.variables[1].get()
-        self.forceValues([firstVal, secondVal])
+        self.__moveBar(1, (secondVal - self.min_val)/(self.max_val - self.min_val))
